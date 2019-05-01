@@ -3,6 +3,7 @@ import { WhiteSpace,WingBlank,List,InputItem,Button } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import router from 'umi/router';
 import axios from 'axios';
+import Redirect from 'umi/redirect';
 import Logo from './../../components/logo';
 
 @createForm()
@@ -10,7 +11,7 @@ class Login extends Component{
     constructor(props){
         super(props);
         this.state= {
-
+            redirect: ''
         }
         this.handleLogin = this.handleLogin.bind(this);
         this.handleRegister = this.handleRegister.bind(this);
@@ -33,7 +34,16 @@ class Login extends Component{
                     console.log('登陆成功')
                     const user = JSON.stringify(res.data);
                     localStorage.setItem('userInfo',user)
-                    router.push('/')
+                    if(!res.data.avatar){
+                        this.setState({
+                            redirect: `${res.data.type}info`
+                        })
+                    }else{
+                        this.setState({
+                            redirect: res.data.type
+                        })
+                    }
+                    // router.push('/')
                 }else{
                     console.log(res.msg)
                 }
@@ -50,6 +60,7 @@ class Login extends Component{
         const { getFieldProps } = this.props.form;
         return(
             <div>
+                {this.state.redirect?<Redirect to={this.state.redirect}/>:null}
                 <Logo />
                 <WingBlank>
                     <List renderHeader={'登录页面'}>
@@ -63,8 +74,9 @@ class Login extends Component{
                             type='password'
                         >密码</InputItem>
                         <WhiteSpace />
-                        <Button type='primary' size='small' style={{width:'40vw',display:'inline-block'}} onClick={this.handleLogin}>登录</Button>
-                        <Button type='primary' size='small' style={{width:'40vw',display:'inline-block',marginLeft:'10vw'}} onClick={this.handleRegister}>注册</Button>
+                        <Button type='primary' size='small' onClick={this.handleLogin}>登录</Button>
+                        <WhiteSpace />
+                        <Button type='primary' size='small' onClick={this.handleRegister}>注册</Button>
                     </List>
                 </WingBlank>
             </div>

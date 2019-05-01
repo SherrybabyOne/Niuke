@@ -8,8 +8,9 @@ const _filter = {'pwd':0,'__v':0}
 
 Router.get('/list',function(req,res){
     // User.remove({},function(err,doc){})
-    User.find({},function(err,doc){
-        return res.json(doc)
+    const {type} = req.query;
+    User.find({type},function(err,doc){
+        return res.json({code:0,data:doc})
     })
 })
 Router.post('/login',function(req,res){
@@ -39,6 +40,18 @@ Router.post('/register',function(req,res){
             const {user,type,_id} = doc;
             return res.json({code:0,data: {user,type,_id}})
         })
+    })
+})
+Router.post('/update',function(req,res){
+    // const { _id,avatar,position,company,money,require } = req.body
+    const body = req.body;
+    // const {_id,...userInfo} = body;
+    User.findByIdAndUpdate(body._id,body,function(err,doc){
+        const data = Object.assign({},{
+            user: doc.user,
+            type: doc.type
+        },body)
+        return res.json({code:0,data})
     })
 })
 // Router.get('/info',function(req,res){

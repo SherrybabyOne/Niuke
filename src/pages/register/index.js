@@ -2,7 +2,7 @@ import React,{Component} from 'react';
 import { WhiteSpace,WingBlank,List,InputItem,Button,Radio } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import axios from 'axios';
-import router from 'umi/router';
+import Redirect from 'umi/redirect';
 import Logo from './../../components/logo';
 const RadioItem = Radio.RadioItem;
 
@@ -13,7 +13,8 @@ class Login extends Component{
         this.state= {
             userInfo: {
                 type: 'genius'
-            }
+            },
+            redirect: ''
         }
         this.handleRegister = this.handleRegister.bind(this);
         this.request = this.request.bind(this);
@@ -48,7 +49,16 @@ class Login extends Component{
                 if(res.code === 0){
                     const userInfo = JSON.stringify(res.data);
                     localStorage.setItem('userInfo',userInfo);
-                    router.push('/');
+                    if(!res.data.avatar){
+                        this.setState({
+                            redirect: `${res.data.type}info`
+                        })
+                    }else{
+                        this.setState({
+                            redirect: res.data.type
+                        })
+                    }
+                    // router.push('/');
                 }else{
                     console.log(res.msg)
                 }
@@ -62,6 +72,7 @@ class Login extends Component{
         const { getFieldProps } = this.props.form;
         return(
             <div>
+                {this.state.redirect?<Redirect to={this.state.redirect} />:null}
                 <Logo />
                 <WingBlank>
                     <List renderHeader={'注册页面'}>
